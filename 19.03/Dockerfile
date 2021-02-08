@@ -4,18 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.13
-
-RUN apk add --no-cache \
-		ca-certificates \
-# DOCKER_HOST=ssh://... -- https://github.com/docker/cli/pull/1014
-		openssh-client
-
-# set up nsswitch.conf for Go's "netgo" implementation (which Docker explicitly uses)
-# - https://github.com/docker/docker-ce/blob/v17.09.0-ce/components/engine/hack/make.sh#L149
-# - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
-# - docker run --rm debian:stretch grep '^hosts:' /etc/nsswitch.conf
-RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
+FROM python:3.7
 
 ENV DOCKER_VERSION 19.03.15
 # TODO ENV DOCKER_SHA256
@@ -24,24 +13,7 @@ ENV DOCKER_VERSION 19.03.15
 
 RUN set -eux; \
 	\
-	apkArch="$(apk --print-arch)"; \
-	case "$apkArch" in \
-		'x86_64') \
-			url='https://download.docker.com/linux/static/stable/x86_64/docker-19.03.15.tgz'; \
-			;; \
-		'armhf') \
-			url='https://download.docker.com/linux/static/stable/armel/docker-19.03.15.tgz'; \
-			;; \
-		'armv7') \
-			url='https://download.docker.com/linux/static/stable/armhf/docker-19.03.15.tgz'; \
-			;; \
-		'aarch64') \
-			url='https://download.docker.com/linux/static/stable/aarch64/docker-19.03.15.tgz'; \
-			;; \
-		*) echo >&2 "error: unsupported architecture ($apkArch)"; exit 1 ;; \
-	esac; \
-	\
-	wget -O docker.tgz "$url"; \
+	wget -O docker.tgz "https://download.docker.com/linux/static/stable/x86_64/docker-19.03.15.tgz"; \
 	\
 	tar --extract \
 		--file docker.tgz \
