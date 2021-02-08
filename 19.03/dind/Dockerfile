@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM palexiev/docker:19.03.15
+FROM registry.supercollider.vmware.com/control-plane/sc-python-docker:19.03
 
 RUN apt-get update
 
